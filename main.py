@@ -2,6 +2,7 @@
 import feedparser
 import requests
 import multiprocessing
+import threading
 
 base_folder = 'downloads'
 
@@ -12,14 +13,19 @@ podcasts = {
 
 def downloadPodcast(name, podcast):
     index = 0
-    for line in feedparser.parse(podcast)['entries']:
-        print "line", line
+    def downloadEpisode(line, index):
         url = filter(lambda x: '.mp3' in x['href'], line['links'])[0]['href']
         print "url", url
         file_name = base_folder + '/' + name + '_' + str(index) + '.mp3'
         with open(file_name, 'wb') as f:
             f.write(requests.get(url).content)
-        index += 1
+    entries = feedparser.parse(podcast)['entries']
+    entry_range = list(range(len(entries)))
+    threads = [threading.Thread(target=downloadEpisode, args=(line, index,)) for line, index in zip(entries, entry_range)]
+    for thread in threads:
+        thread.start()
+    for thread in threads:
+        thread.join()
 
 processes = []
 for podcast_name in podcasts:

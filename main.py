@@ -36,6 +36,9 @@ episode_queue = multiprocessing.Queue(maxsize=len(episodes))
 for episode in episodes:
     episode_queue.put(episode)
 
+
+print "Ep queue", episode_queue
+
 def downloadPodcast((url, file_name)):
         with open(file_name, 'wb') as f:
             f.write(requests.get(url).content)
@@ -43,18 +46,23 @@ def downloadPodcast((url, file_name)):
 
 def processQueue():
     print "Processing"
-    while episode_queue.empty() is False:
+    while True:
         try:
             episode = episode_queue.get(True)
+            print "Got episode", episode
+            downloadPodcast(episode)
         except Queue.Empty:
+            print "Queue empty"
             return
-        downloadPodcast(episode)
+    print "Processing failed"
 
 processes = []
 for i in range(20):
     p = multiprocessing.Process(target=processQueue)
     p.start()
     processes.append(p)
+
+print "All started"
 
 for process in processes:
     process.join()

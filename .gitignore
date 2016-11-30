@@ -1,4 +1,5 @@
 .DS_Store
+*.csv
 *.wav
 *.mp3
 *.pyc

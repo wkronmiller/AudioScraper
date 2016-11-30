@@ -13,7 +13,7 @@ podcasts = {
         'OnTheMedia': 'http://feeds.wnyc.org/onthemedia'
 }
 
-def convertSong(path):
+def mp3ToWav(path):
     name = path.split('/')[-1].split('.')[0]
     print "Converting %s" % (name)
     song = AudioSegment.from_mp3(path)
@@ -42,7 +42,7 @@ print "Ep queue", episode_queue
 def downloadPodcast((url, file_name)):
         with open(file_name, 'wb') as f:
             f.write(requests.get(url).content)
-        convertSong(file_name)
+        mp3ToWav(file_name)
 
 def processQueue():
     print "Processing"
@@ -57,7 +57,7 @@ def processQueue():
     print "Processing failed"
 
 processes = []
-for i in range(20):
+for i in range(30):
     p = multiprocessing.Process(target=processQueue)
     p.start()
     processes.append(p)
